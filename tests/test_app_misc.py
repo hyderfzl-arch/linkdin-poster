@@ -1,5 +1,3 @@
-import re
-
 from app import (
     _linkedin_format,
     _safe_company_name,
