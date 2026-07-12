@@ -280,6 +280,18 @@ def get_db_session() -> Session:
     return g.db
 
 
+def get_db():
+    """Compatibility generator used by tests and callers expecting an
+    iterator that yields a database session. Use `next(get_db())` or iterate
+    in a context where the caller is responsible for closing the session.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @app.teardown_appcontext
 def _close_db_session(exc: BaseException | None) -> None:
     db = g.pop("db", None)
