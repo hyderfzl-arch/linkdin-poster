@@ -768,6 +768,7 @@ def profile():
     if not user:
         flash("Please log in again.", "error")
         return redirect(url_for("login"))
+    setting = get_or_create_settings(db, user.id)
     form = ProfileForm(obj=user)
     if request.method == "GET":
         if user.openai_api_key:
@@ -776,15 +777,18 @@ def profile():
             form.linkedin_client_secret.data = decrypt(user.linkedin_client_secret)
         if user.linkedin_org_urn:
             form.linkedin_org_urn.data = user.linkedin_org_urn
+        form.timezone.data = setting.timezone or "UTC"
+        form.language.data = setting.language or "en"
+        form.email_notifications.data = bool(setting.email_notifications)
 
     if form.validate_on_submit():
         user.name = (form.name.data or "").strip()[:255]
         user.headline = (form.headline.data or "").strip()[:255]
         user.linkedin_url = (form.linkedin_url.data or "").strip()[:1000]
         user.linkedin_org_urn = (form.linkedin_org_urn.data or "").strip()[:255]
-        user.timezone = form.timezone.data or "UTC"
-        user.language = form.language.data or "en"
-        user.email_notifications = 1 if form.email_notifications.data else 0
+        setting.timezone = form.timezone.data or "UTC"
+        setting.language = form.language.data or "en"
+        setting.email_notifications = 1 if form.email_notifications.data else 0
         user.openai_api_key = encrypt(form.openai_api_key.data or "")
         user.linkedin_client_id = (form.linkedin_client_id.data or "").strip()
         user.linkedin_client_secret = encrypt(form.linkedin_client_secret.data or "")
