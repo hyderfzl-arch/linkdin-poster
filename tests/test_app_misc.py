@@ -1,3 +1,5 @@
+from sqlalchemy import text
+
 from app import (
     _linkedin_format,
     _safe_company_name,
@@ -12,8 +14,9 @@ from app import (
 def test_linkedin_format_basic():
     text = "Hello #world\n\nVisit https://example.com"
     out = _linkedin_format(text)
-    assert "lp-hashtag" in str(out)
-    assert "https://example.com" in str(out)
+    s = str(out)
+    assert "lp-hashtag" in s
+    assert "https://example.com" in s
 
 
 def test_safe_helpers_defaults():
@@ -29,7 +32,7 @@ def test_get_db_generator_and_session(db_session):
     gdb = next(get_db())
     try:
         # basic query should run without error
-        r = gdb.execute("SELECT 1").scalar()
+        r = gdb.execute(text("SELECT 1")).scalar()
         assert int(r) == 1
     finally:
         gdb.close()
