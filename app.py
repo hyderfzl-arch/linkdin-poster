@@ -114,6 +114,7 @@ startup_issues = validate_environment()
 for issue in startup_issues:
     logger.warning("Startup validation: %s", issue)
 
+
 def _linkedin_format(text: str) -> str:
     """Convert plain post text into LinkedIn-like HTML: paragraphs + linked hashtags.
 
@@ -128,13 +129,16 @@ def _linkedin_format(text: str) -> str:
     for p in paragraphs:
         p_html = re.sub(
             r"#(\w+)",
-            r'<a href="https://www.linkedin.com/feed/hashtag/?keywords=\1" class="lp-hashtag" target="_blank">#\1</a>',
+            (
+                '<a href="https://www.linkedin.com/feed/hashtag/?keywords=\\1" '
+                'class="lp-hashtag" target="_blank">#\\1</a>'
+            ),
             p.replace("\n", "<br>"),
         )
         # Link bare URLs lightly
         p_html = re.sub(
             r"(https?://[^\s\)]+)",
-            r'<a href="\1" target="_blank" rel="noopener">\1</a>',
+            r'<a href="\\1" target="_blank" rel="noopener">\\1</a>',
             p_html,
         )
         out += f'<p class="mb-3 last:mb-0">{p_html}</p>'
@@ -180,7 +184,6 @@ def enforce_https():
     ):
         url = request.url.replace("http://", "https://", 1)
         return redirect(url, code=301)
-
 
 
 @app.errorhandler(404)
@@ -390,7 +393,8 @@ def _seed_demo_data(db: Session, user_id: int) -> None:
     sample_drafts = [
         (
             "🚀 Just shipped: a smarter way for small teams to stay active on LinkedIn.\n\n"
-            "We built Auto-Poster so founders can turn a few example posts into a week of ready-to-publish drafts — "
+            "We built Auto-Poster so founders can turn a few example posts "
+            "into a week of ready-to-publish drafts — "
             "no copywriting block, no late-night scheduling.\n\n"
             "The first draft takes under a minute. The rest run on autopilot.\n\n"
             "#FounderLife #LinkedIn #ContentAutomation #SmallBusiness",
@@ -403,7 +407,8 @@ def _seed_demo_data(db: Session, user_id: int) -> None:
             "1. You post only when inspiration strikes.\n"
             "2. Every draft starts from a blank page.\n"
             "3. Great ideas sit in notes apps and never ship.\n\n"
-            "Consistent presence beats viral moments. Build a system that writes while you sleep.\n\n"
+            "Consistent presence beats viral moments. Build a system that "
+            "writes while you sleep.\n\n"
             "#LinkedInStrategy #B2BMarketing #Consistency",
             "draft",
             "gpt-4o-mini",
@@ -411,7 +416,8 @@ def _seed_demo_data(db: Session, user_id: int) -> None:
         ),
         (
             "✅ Published: our first demo post via LinkedIn Auto-Poster.\n\n"
-            "The app generated the draft from saved inspiration, let me edit in one screen, and published in a single click.\n\n"
+            "The app generated the draft from saved inspiration, let me "
+            "edit in one screen, and published in a single click.\n\n"
             "If you're building in public, this is the kind of leverage you want.\n\n"
             "#BuildInPublic #Automation #Productivity",
             "published",
@@ -420,7 +426,8 @@ def _seed_demo_data(db: Session, user_id: int) -> None:
         ),
         (
             "💡 The best AI content tools don't replace your voice — they amplify it.\n\n"
-            "We feed the model example posts that already sound like us, then let it draft variations that stay on brand.\n\n"
+            "We feed the model example posts that already sound like us, "
+            "then let it draft variations that stay on brand.\n\n"
             "Result: more posts, same voice, less burnout.\n\n"
             "#AI #ContentMarketing #BrandVoice",
             "rejected",

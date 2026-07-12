@@ -5,13 +5,7 @@ exclude =
     __pycache__,
     alembic/versions,
     .venv,
-    .env
-[flake8]
-max-line-length = 100
-exclude =
-    .venv,
-    .git,
-    __pycache__,
+    .env,
     build,
     dist,
     migrations,

@@ -54,7 +54,10 @@ def fetch_linkedin_api_inspiration(
             {
                 "source": "linkedin_api",
                 "title": "",
-                "content": "Demo LinkedIn API inspiration post: AI is transforming how small teams build and share content.",
+                "content": (
+                    "Demo LinkedIn API inspiration post: AI is transforming how "
+                    "small teams build and share content."
+                ),
                 "url": "",
             }
             for _ in range(min(limit, 3))
