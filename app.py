@@ -127,20 +127,24 @@ def _linkedin_format(text: str) -> str:
     paragraphs = re.split(r"\n\s*\n", text)
     out = ""
     for p in paragraphs:
-        p_html = re.sub(
-            r"#(\w+)",
-            (
-                '<a href="https://www.linkedin.com/feed/hashtag/?keywords=\\1" '
-                'class="lp-hashtag" target="_blank">#\\1</a>'
-            ),
-            p.replace("\n", "<br>"),
-        )
-        # Link bare URLs lightly
-        p_html = re.sub(
-            r"(https?://[^\s\)]+)",
-            r'<a href="\\1" target="_blank" rel="noopener">\\1</a>',
-            p_html,
-        )
+        p_html = p.replace("\n", "<br>")
+
+        # Link bare URLs first using a callable to avoid backreference escaping issues
+        def _url_repl(m):
+            url = m.group(1)
+            return f'<a href="{url}" target="_blank" rel="noopener">{url}</a>'
+
+        p_html = re.sub(r"(https?://[^\s\)]+)", _url_repl, p_html)
+
+        # Then replace hashtags; using a callable prevents accidental re-linking
+        def _hashtag_repl(m):
+            tag = m.group(1)
+            return (
+                f'<a href="https://www.linkedin.com/feed/hashtag/?keywords={tag}" '
+                f'class="lp-hashtag" target="_blank">#{tag}</a>'
+            )
+
+        p_html = re.sub(r"#(\w+)", _hashtag_repl, p_html)
         out += f'<p class="mb-3 last:mb-0">{p_html}</p>'
     return Markup(out)
 
