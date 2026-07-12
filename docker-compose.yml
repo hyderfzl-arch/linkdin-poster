@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: poster
+      POSTGRES_PASSWORD: poster
+      POSTGRES_DB: linkedin_poster
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poster -d linkedin_poster"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg2://poster:poster@db:5432/linkedin_poster
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      LINKEDIN_REDIRECT_URI: ${LINKEDIN_REDIRECT_URI:-http://localhost:5000/callback}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      FORCE_HTTPS: "false"
+      POST_TIME: ${POST_TIME:-09:00}
+      RATE_LIMIT_STORAGE_URI: memory://
+      SCHEDULER_ENABLED: "false"
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "cli.py", "run-scheduler"]
+    environment:
+      DATABASE_URL: postgresql+psycopg2://poster:poster@db:5432/linkedin_poster
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      LINKEDIN_REDIRECT_URI: ${LINKEDIN_REDIRECT_URI:-http://localhost:5000/callback}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      POST_TIME: ${POST_TIME:-09:00}
+      SCHEDULER_ENABLED: "true"
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
