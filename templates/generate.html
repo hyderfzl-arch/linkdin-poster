@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Draft | LinkedIn Auto-Poster{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-1">Generate LinkedIn Post</h1>
+        <p class="text-slate-500">Pick a model, target audience, and inspiration source. AI will write a draft in seconds.</p>
+    </div>
+
+    <form method="post" class="card rounded-2xl p-6 sm:p-8">
+        {{ form.hidden_tag() }}
+
+        <!-- Section 1: Model & Audience -->
+        <div class="mb-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                </span>
+                <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Configuration</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.model.label.text }}</label>
+                    {{ form.model(class="input-field") }}
+                    <p class="text-xs text-slate-400 mt-1.5">Choose the AI writer style for your brand.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.target.label.text }}</label>
+                    {{ form.target(class="input-field") }}
+                    <p class="text-xs text-slate-400 mt-1.5">Who should this post resonate with?</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-slate-100 my-6">
+
+        <!-- Section 2: Inspiration -->
+        <div class="mb-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                </span>
+                <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Inspiration Source</h2>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.inspiration_source.label.text }}</label>
+                {{ form.inspiration_source(id="inspiration_source", class="input-field") }}
+            </div>
+
+            <div class="source-field mb-5" id="manual-field">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.manual_text.label.text }}</label>
+                {{ form.manual_text(rows=5, class="input-field", placeholder="Optional topic, angle, or example post…") }}
+                <p class="text-xs text-slate-400 mt-1.5">A short prompt or example helps the model match your tone.</p>
+            </div>
+
+            <div class="source-field mb-5 hidden" id="rss-field">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.rss_url.label.text }}</label>
+                {{ form.rss_url(class="input-field", type="url", placeholder="https://example.com/feed.xml") }}
+            </div>
+
+            <div class="source-field mb-5 hidden" id="api-field">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.linkedin_urn.label.text }}</label>
+                {{ form.linkedin_urn(class="input-field", placeholder="urn:li:organization:12345") }}
+                <p class="text-xs text-slate-400 mt-1.5">LinkedIn Community Management API access required.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end pt-2">
+            <button type="submit" id="generate-btn" class="btn-primary px-5 py-2.5 rounded-xl font-semibold inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span>Generate Draft</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script nonce="{{ csp_nonce() }}">
+    document.querySelector('form').addEventListener('submit', function() {
+        const btn = document.getElementById('generate-btn');
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        btn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating…`;
+    });
+
+    const source = document.getElementById('inspiration_source');
+    const manual = document.getElementById('manual-field');
+    const rss = document.getElementById('rss-field');
+    const api = document.getElementById('api-field');
+
+    function updateFields() {
+        [manual, rss, api].forEach(el => {
+            el.classList.add('hidden');
+            const input = el.querySelector('input, textarea');
+            if (input) input.disabled = true;
+        });
+        if (source.value === 'manual' || source.value === 'context') { manual.classList.remove('hidden'); manual.querySelector('textarea').disabled = false; }
+        if (source.value === 'rss') { rss.classList.remove('hidden'); rss.querySelector('input').disabled = false; }
+        if (source.value === 'linkedin_api') { api.classList.remove('hidden'); api.querySelector('input').disabled = false; }
+    }
+
+    source.addEventListener('change', updateFields);
+    updateFields();
+</script>
+{% endblock %}

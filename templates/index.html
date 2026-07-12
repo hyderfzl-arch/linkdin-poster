@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero -->
+<section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-brand-700 to-indigo-600 text-white shadow-2xl mb-14">
+    <div class="absolute inset-0 opacity-[0.12] dot-grid"></div>
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-brand-500/25 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent-500/15 rounded-full blur-3xl"></div>
+    <div class="relative px-6 sm:px-10 py-18 sm:py-24 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-brand-50 text-xs font-semibold tracking-wide mb-5 backdrop-blur">
+            LinkedIn Auto-Poster v{{ settings.app_version or '1.0' }}
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight mb-5">Your LinkedIn content assistant</h1>
+        <p class="text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto mb-10">
+            Connect LinkedIn, gather inspiration, and let AI generate polished drafts — ready to publish in one click.
+        </p>
+
+        {% if connected %}
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/15 backdrop-blur text-emerald-50 rounded-full mb-10 border border-emerald-300/30">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                LinkedIn connected
+            </div>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{{ url_for('generate_draft') }}" class="btn-primary btn-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Generate New Draft
+                </a>
+                <a href="{{ url_for('drafts') }}" class="btn-ghost-light btn-lg">
+                    View Drafts
+                </a>
+            </div>
+        {% else %}
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur text-amber-100 rounded-full mb-10 border border-white/20">
+                <span class="w-2 h-2 bg-accent-400 rounded-full"></span>
+                LinkedIn not connected
+            </div>
+            <div class="flex justify-center">
+                <a href="{{ url_for('connect_linkedin') }}" class="btn-primary btn-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.85.577-4.147"></path></svg>
+                    Connect LinkedIn
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Steps -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+    <div class="card bg-white p-7 rounded-2xl">
+        <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center mb-5 ring-4 ring-brand-50/50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        <h2 class="text-lg font-semibold mb-2 text-slate-900">1. Connect</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">Authorize LinkedIn once so the app can publish posts securely on your behalf.</p>
+    </div>
+    <div class="card bg-white p-7 rounded-2xl">
+        <div class="w-12 h-12 bg-accent-100 text-accent-600 rounded-xl flex items-center justify-center mb-5 ring-4 ring-accent-100/50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+        </div>
+        <h2 class="text-lg font-semibold mb-2 text-slate-900">2. Inspire</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">Add example posts manually, via RSS, or from your own LinkedIn content to guide the AI.</p>
+    </div>
+    <div class="card bg-white p-7 rounded-2xl">
+        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-5 ring-4 ring-emerald-50/50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        </div>
+        <h2 class="text-lg font-semibold mb-2 text-slate-900">3. Generate & Publish</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">AI writes a draft. Review, edit, and publish to your profile or company page.</p>
+    </div>
+</div>
+
+<!-- Quick status cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="card bg-white rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Daily post time</h3>
+        </div>
+        <p class="text-3xl font-bold text-slate-900">{{ settings.post_time or '09:00' }}</p>
+        <p class="text-sm text-slate-500 mt-1">Change in <a href="{{ url_for('settings') }}" class="text-brand-600 hover:underline font-medium">Settings</a>.</p>
+    </div>
+    <div class="card bg-white rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 bg-accent-100 text-accent-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Default inspiration</h3>
+        </div>
+        <p class="text-3xl font-bold text-slate-900 capitalize">{{ settings.default_inspiration or 'manual' }}</p>
+        <p class="text-sm text-slate-500 mt-1">Manage in <a href="{{ url_for('inspiration_page') }}" class="text-brand-600 hover:underline font-medium">Inspiration</a>.</p>
+    </div>
+    <div class="card bg-white rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Default model</h3>
+        </div>
+        <p class="text-3xl font-bold text-slate-900">{{ settings.default_model or 'gpt-4o' }}</p>
+        <p class="text-sm text-slate-500 mt-1">Choose in <a href="{{ url_for('settings') }}" class="text-brand-600 hover:underline font-medium">Settings</a>.</p>
+    </div>
+    <div class="card bg-white rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Post target</h3>
+        </div>
+        <p class="text-3xl font-bold text-slate-900 capitalize">{{ settings.default_target or 'profile' }}</p>
+        <p class="text-sm text-slate-500 mt-1">Profile or company page.</p>
+    </div>
+</div>
+{% endblock %}

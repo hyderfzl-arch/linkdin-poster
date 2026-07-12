@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | LinkedIn Auto-Poster{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-1">Settings</h1>
+        <p class="text-slate-500">Configure your company profile, posting preferences, and daily schedule.</p>
+    </div>
+
+    <form method="post" class="card rounded-2xl p-6 sm:p-8">
+        {{ form.hidden_tag() }}
+
+        <!-- Company profile -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center ring-1 ring-brand-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                </span>
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-900">Company profile</h2>
+                    <p class="text-xs text-slate-400">This context is sent to the AI every time a draft is generated.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.company_name.label.text }}</label>
+                    {{ form.company_name(class="input-field", placeholder="e.g. Acme Inc.", value=settings.company_name or '') }}
+                    <p class="text-xs text-slate-400 mt-1.5">Public name used in LinkedIn previews.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.company_context.label.text }}</label>
+                    {{ form.company_context(class="input-field", rows=4, placeholder="Describe what your company does, target audience, and key messages...") }}
+                    <p class="text-xs text-slate-400 mt-1.5">Be specific about tone, audience, and topics to avoid.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-slate-100 mb-8">
+
+        <!-- Defaults -->
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center ring-1 ring-violet-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </span>
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-900">Defaults</h2>
+                    <p class="text-xs text-slate-400">Pre-fill options when generating new drafts.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.default_model.label.text }}</label>
+                    {{ form.default_model(class="input-field") }}
+                    <p class="text-xs text-slate-400 mt-1.5">Writer style used by default.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.default_target.label.text }}</label>
+                    {{ form.default_target(class="input-field") }}
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.default_inspiration.label.text }}</label>
+                    {{ form.default_inspiration(class="input-field") }}
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.post_time.label.text }}</label>
+                    {{ form.post_time(class="input-field", value=settings.post_time or '09:00') }}
+                    <p class="text-xs text-slate-400 mt-1.5">24-hour format. The scheduler runs here every day.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <a href="{{ url_for('index') }}" class="btn-secondary">Cancel</a>
+            <button type="submit" id="save-btn" class="btn-primary px-5 py-2.5 rounded-xl font-semibold inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Save Settings
+            </button>
+        </div>
+    </form>
+</div>
+
+<script nonce="{{ csp_nonce() }}">
+    document.querySelector('form').addEventListener('submit', function() {
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Saving…`;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+    });
+</script>
+{% endblock %}

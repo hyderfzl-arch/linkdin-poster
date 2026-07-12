@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Review Draft | LinkedIn Auto-Poster{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <div class="mb-8">
+        <div class="flex items-center gap-2 mb-2">
+            <a href="{{ url_for('drafts') }}" class="text-sm font-medium text-slate-500 hover:text-brand-600 inline-flex items-center gap-1 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Back to drafts
+            </a>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900">Review Draft</h1>
+        <p class="text-slate-500 mt-1">Edit, preview, publish, or reject the generated post.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-6 items-start">
+        <!-- Editor column -->
+        <div class="lg:col-span-3 space-y-6">
+            <div class="card p-6 sm:p-7 rounded-2xl">
+                <div class="flex flex-wrap items-center gap-2 mb-5">
+                    <span class="badge
+                        {% if draft.status == 'published' %}badge-published
+                        {% elif draft.status == 'rejected' %}badge-rejected
+                        {% else %}badge-pending
+                        {% endif %}
+                        text-xs uppercase tracking-wide font-semibold px-3 py-1 rounded-full">
+                        {{ draft.status | title }}
+                    </span>
+                    <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        {{ draft.model }}
+                    </span>
+                    <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Target: {{ draft.target }}
+                    </span>
+                </div>
+
+                <form method="post" action="{{ url_for('publish_draft', draft_id=draft.id) }}" id="publish-form" class="space-y-4">
+                    {{ csrf_token() }}
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Post content</label>
+                        <textarea name="content" id="draft-content" rows="12" class="input-field" placeholder="Edit your draft here…">{{ draft.content }}</textarea>
+                        <p class="text-xs text-slate-400 mt-1.5">Changes update the LinkedIn preview in real time.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button type="submit" id="publish-btn" class="btn-success px-5 py-2.5 rounded-xl font-semibold inline-flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <span>Publish to LinkedIn</span>
+                        </button>
+                        <a href="{{ url_for('drafts') }}" class="btn-secondary px-5 py-2.5 rounded-xl font-semibold inline-flex items-center justify-center">
+                            Save as Draft
+                        </a>
+                    </div>
+                </form>
+
+                <hr class="border-slate-100 my-6">
+
+                <form method="post" action="{{ url_for('reject_draft', draft_id=draft.id) }}" id="reject-form">
+                    {{ csrf_token() }}
+                    <button type="submit" id="reject-btn" class="btn-danger px-5 py-2.5 rounded-xl font-semibold inline-flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span>Reject Draft</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Live preview column -->
+        <div class="lg:col-span-2">
+            <div class="sticky top-24">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    <h2 class="text-sm font-semibold text-slate-900">LinkedIn Preview</h2>
+                </div>
+                <div id="live-preview">
+                    {{ linkedin_preview_card(draft.content, user.name or 'Demo User', user.headline or 'Founder & Product Builder', draft.created_at) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script nonce="{{ csp_nonce() }}">
+    function setLoading(btnId, text) {
+        const btn = document.getElementById(btnId);
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        btn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            ${text}`;
+    }
+    document.getElementById('publish-form').addEventListener('submit', () => setLoading('publish-btn', 'Publishing…'));
+    document.getElementById('reject-form').addEventListener('submit', () => setLoading('reject-btn', 'Rejecting…'));
+</script>
+{% endblock %}

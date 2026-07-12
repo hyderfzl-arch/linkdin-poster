@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Inspiration | LinkedIn Auto-Poster{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-1">Inspiration Sources</h1>
+        <p class="text-slate-500">Collect example posts, RSS feeds, and company context to train the AI voice.</p>
+    </div>
+
+    <!-- Add inspiration form -->
+    <form method="post" class="card p-6 sm:p-8 rounded-2xl mb-10">
+        {{ form.hidden_tag() }}
+
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="text-lg font-semibold text-slate-900">Add inspiration</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.source.label.text }}</label>
+                {{ form.source(id="source", class="input-field") }}
+            </div>
+
+            <div class="source-field sm:col-span-2" id="manual-field">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.manual_text.label.text }}</label>
+                {{ form.manual_text(rows=5, class="input-field", placeholder="Paste a LinkedIn post you like…") }}
+            </div>
+
+            <div class="source-field sm:col-span-2 hidden" id="rss-field">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.rss_url.label.text }}</label>
+                {{ form.rss_url(class="input-field", type="url", placeholder="https://example.com/feed.xml") }}
+            </div>
+
+            <div class="source-field sm:col-span-2 hidden" id="api-field">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ form.linkedin_urn.label.text }} <span class="text-slate-500 font-normal">(e.g. urn:li:organization:12345)</span></label>
+                {{ form.linkedin_urn(class="input-field", placeholder="urn:li:organization:12345") }}
+                <p class="text-xs text-slate-400 mt-1.5">Requires approved LinkedIn Community Management API access.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end">
+            <button type="submit" id="save-btn" class="btn-primary px-5 py-2.5 rounded-xl font-semibold inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <span>Save Inspiration</span>
+            </button>
+        </div>
+    </form>
+
+    <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        </div>
+        <h2 class="text-xl font-semibold text-slate-900">Saved Inspiration</h2>
+    </div>
+
+    <div class="grid gap-5">
+        {% for post in posts %}
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="badge
+                    {% if post.source == 'manual' %}bg-blue-50 text-blue-700 border border-blue-100
+                    {% elif post.source == 'rss' %}bg-violet-50 text-violet-700 border border-violet-100
+                    {% elif post.source == 'linkedin_api' %}bg-sky-50 text-sky-700 border border-sky-100
+                    {% else %}bg-slate-50 text-slate-700 border border-slate-100
+                    {% endif %}
+                    text-xs font-semibold px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                    {% if post.source == 'manual' %}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    {% elif post.source == 'rss' %}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                    {% elif post.source == 'linkedin_api' %}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                    {% else %}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    {% endif %}
+                    {{ post.source.replace('_', ' ') | title }}
+                </span>
+                {% if post.title %}
+                <span class="text-sm font-medium text-slate-700 truncate max-w-md">{{ post.title }}</span>
+                {% endif %}
+                <span class="text-xs text-slate-400 ml-auto">{{ post.created_at.strftime('%b %d, %Y · %H:%M') }}</span>
+            </div>
+            <p class="text-slate-800 leading-relaxed whitespace-pre-line">{{ post.content }}</p>
+            {% if post.url %}
+            <a href="{{ post.url }}" target="_blank" rel="noopener" class="inline-flex items-center mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline">
+                {{ post.url[:60] }}{% if post.url | length > 60 %}…{% endif %}
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="card text-center py-16 rounded-2xl">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+            </div>
+            <p class="text-slate-700 font-medium">No inspiration posts saved yet.</p>
+            <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">Add a manual post, RSS feed, or LinkedIn source above to train the AI on your voice.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if total > per_page %}
+    <div class="flex items-center justify-between mt-8">
+        <p class="text-sm text-slate-500">Page {{ page }} of {{ ((total + per_page - 1) // per_page) }}</p>
+        <div class="flex gap-2">
+            {% if page > 1 %}
+            <a href="{{ url_for('inspiration_page', page=page-1) }}" class="btn-secondary btn-sm px-4 py-2 rounded-xl">← Previous</a>
+            {% endif %}
+            {% if page * per_page < total %}
+            <a href="{{ url_for('inspiration_page', page=page+1) }}" class="btn-secondary btn-sm px-4 py-2 rounded-xl">Next →</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script nonce="{{ csp_nonce() }}">
+    document.querySelector('form').addEventListener('submit', function() {
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg> Saving…`;
+    });
+
+    const source = document.getElementById('source');
+    const manual = document.getElementById('manual-field');
+    const rss = document.getElementById('rss-field');
+    const api = document.getElementById('api-field');
+
+    function updateFields() {
+        [manual, rss, api].forEach(el => {
+            el.classList.add('hidden');
+            const input = el.querySelector('input, textarea');
+            if (input) input.disabled = true;
+        });
+        if (source.value === 'manual' || source.value === 'context') { manual.classList.remove('hidden'); manual.querySelector('textarea').disabled = false; }
+        if (source.value === 'rss') { rss.classList.remove('hidden'); rss.querySelector('input').disabled = false; }
+        if (source.value === 'linkedin_api') { api.classList.remove('hidden'); api.querySelector('input').disabled = false; }
+    }
+
+    source.addEventListener('change', updateFields);
+    updateFields();
+</script>
+{% endblock %}

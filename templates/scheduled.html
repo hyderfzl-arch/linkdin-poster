@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Scheduled Posts | LinkedIn Auto-Poster{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-1">Scheduled Posts</h1>
+            <p class="text-slate-500">Upcoming and previously scheduled LinkedIn posts.</p>
+        </div>
+        <a href="{{ url_for('drafts') }}" class="btn-secondary px-5 py-2.5 rounded-xl font-semibold inline-flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            Back to Drafts
+        </a>
+    </div>
+
+    {% if drafts %}
+    <div class="space-y-6">
+        {% for draft in drafts %}
+        <div class="card p-1 rounded-2xl overflow-hidden">
+            <div class="p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="badge
+                            {% if draft.status == 'published' %}badge-published
+                            {% elif draft.status == 'rejected' %}badge-rejected
+                            {% else %}badge-pending
+                            {% endif %}
+                            text-xs uppercase tracking-wide font-semibold px-3 py-1 rounded-full">
+                            {{ draft.status | title }}
+                        </span>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">{{ draft.model }}</span>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">Target: {{ draft.target | title }}</span>
+                    </div>
+                    <span class="text-sm text-slate-400 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {{ draft.created_at.strftime('%b %d, %Y · %H:%M') }}
+                    </span>
+                </div>
+
+                {{ linkedin_preview_card(draft.content, user.name or 'Demo User', user.headline or 'Founder & Product Builder', draft.created_at) }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-12 text-center rounded-2xl">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">Nothing scheduled yet</h3>
+        <p class="text-slate-500 mb-6 max-w-md mx-auto">Drafts set to publish later will appear here. For now, generate a draft and publish or schedule it.</p>
+        <a href="{{ url_for('generate_draft') }}" class="btn-primary px-6 py-3 rounded-xl font-semibold inline-block">Generate a draft</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
