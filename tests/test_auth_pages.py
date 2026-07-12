@@ -28,7 +28,6 @@ def test_verify_logs_in_user(client, db_session):
     from utils import utc_now
 
     email = f"verify-{uuid.uuid4().hex[:8]}@example.com"
-    password = "password123"
     user = User(
         email=email,
         name="Verify User",

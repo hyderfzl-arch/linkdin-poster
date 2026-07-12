@@ -44,7 +44,10 @@ def validate_environment() -> list[str]:
 
     if config.ENVIRONMENT == "production" and config.RATE_LIMIT_STORAGE_URI == "memory://":
         issues.append(
-            "RATE_LIMIT_STORAGE_URI is 'memory://'. Production deployments with more than one worker should use Redis (e.g. redis://localhost:6379)."
+            (
+                "RATE_LIMIT_STORAGE_URI is 'memory://'. Production deployments with more than"
+                " one worker should use Redis (e.g. redis://localhost:6379)."
+            )
         )
 
     if config.ENVIRONMENT == "production" and config.MAX_CONTENT_LENGTH > 16 * 1024 * 1024:

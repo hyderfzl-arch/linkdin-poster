@@ -2,7 +2,7 @@ import atexit
 import logging
 import os
 import secrets
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from utils import as_utc, utc_now
 
@@ -51,7 +51,7 @@ from linkedin_auth import (
     save_tokens,
 )
 from linkedin_poster import create_post
-from models import Draft, InspirationPost, SessionLocal, Setting, User, get_db, init_db
+from models import Draft, InspirationPost, SessionLocal, Setting, User, init_db
 from security import decrypt, encrypt
 import re
 from scheduler import shutdown_scheduler, start_scheduler
@@ -180,6 +180,7 @@ def enforce_https():
     ):
         url = request.url.replace("http://", "https://", 1)
         return redirect(url, code=301)
+
 
 
 @app.errorhandler(404)

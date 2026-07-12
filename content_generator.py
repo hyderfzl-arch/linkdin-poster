@@ -3,7 +3,6 @@ import logging
 from openai import OpenAI
 
 import config
-from security import decrypt
 
 logger = logging.getLogger(__name__)
 

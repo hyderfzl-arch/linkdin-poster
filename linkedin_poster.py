@@ -1,6 +1,7 @@
 import logging
 
 import config
+import requests
 from http_client import get_http_session, get_timeout
 from linkedin_auth import get_valid_access_token
 from models import User
@@ -32,7 +33,7 @@ def get_profile_urn(user: User, db) -> str:
         )
     try:
         resp.raise_for_status()
-    except Exception as e:
+    except Exception:
         _handle_linkedin_error(resp, "userinfo")
         raise
     data = resp.json()
